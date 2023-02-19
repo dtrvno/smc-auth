@@ -32,11 +32,18 @@ docker run --name mysql -p 3306:3306 -d --net keycloak-network -e MYSQL_DATABASE
 
  docker run --name keycloak -p 8080:8080 -d --net keycloak-network -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin -e KC_DB_PASSWORD=keycloak -e KC_DB=mysql -e KC_DB_USER_NAME=keycloak -e KC_DB_URL=jdbc:mysql://mysql:3306/keycloak -v /tmp/mysql:/var/lib/mysql quay.io/keycloak/keycloak:latest start-dev
 
+docker run --name mysql20 -p 3306:3306 -d --net keycloak-network -e MYSQL_DATABASE=keycloak -e MYSQL_USER=keycloak -e MYSQL_PASSWORD=keycloak -e MYSQL_ROOT_PASSWORD=keycloak_root -v /tmp/sql20:/var/lib/mysql mysql
+
+docker run --name keycloak -p 8080:8080 -d --net keycloak-network -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin -e KC_DB_PASSWORD=keycloak -e KC_DB=mysql -e KC_DB_USER_NAME=keycloak -e KC_DB_URL=jdbc:mysql://mysql20:3306/keycloak  quay.io/keycloak/keycloak:latest start-dev
+
 *********** new version 17
 docker run --name mysql17 -p 33017:3306 -d --net keycloak-network -e MYSQL_TCP_PORT=33017 -e MYSQL_DATABASE=keycloak -e MYSQL_USER=keycloak -e MYSQL_PASSWORD=keycloak -e MYSQL_ROOT_PASSWORD=keycloak_root -v /tmp/mysql_keycloak17:/var/lib/mysql mysql
 
 docker run --name keycloak17 -p 8081:8080 -d --net keycloak-network -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin -e KC_DB_PASSWORD=keycloak -e KC_DB=mysql -e KC_DB_USER_NAME=keycloak -e KEYCLOAK_HTTPS_PORT=8081  -e KC_DB_URL=jdbc:mysql://mysql17:33017/keycloak quay.io/keycloak/keycloak:17.0.0  -Djboss.http.port=8081  start-dev
 
+docker run --name mysql17 -p 33017:3306 -d --net keycloak-network -e MYSQL_TCP_PORT=33017 -e MYSQL_DATABASE=keycloak -e MYSQL_USER=keycloak -e MYSQL_PASSWORD=keycloak -e MYSQL_ROOT_PASSWORD=keycloak_root -v /tmp/sql17:/var/lib/mysql mysql
+
+docker run --name keycloak17 -p 8081:8080 -d --net keycloak-network -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin -e KC_DB_PASSWORD=keycloak -e KC_DB=mysql -e KC_DB_USER_NAME=keycloak -e KEYCLOAK_HTTPS_PORT=8081  -e KC_DB_URL=jdbc:mysql://mysql17:33017/keycloak quay.io/keycloak/keycloak:17.0.0  -Djboss.http.port=8081  start-dev
 
 **********************
 Audience  https://stackoverflow.com/questions/53550321/keycloak-gatekeeper-aud-claim-and-client-id-do-not-match
