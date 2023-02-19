@@ -1,0 +1,45 @@
+set client authentication on to get credentials tab
+create users
+set user's password
+create role
+assign users to role
+temporary replace "sub" for current users's id
+
+Go to Client Scopes Menu from the realm 'test_realm';
+Select roles;
+Go to Mappers;
+Click on the Mapper 'realm roles'
+There enable the option 'Add to userinfo'
+Save and try again.
+
+*********************************************************
+
+
+docker run --name keycloak -p 5030:5030 -d -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:19.0.2 start-dev
+docker network create keycloak-network
+
+docker run --name mypostgres -p 5432:5432 -e POSTGRES_USER=dima -e POSTGRES_PASSWORD=dima -e POSTGRES_DB=postgresDB --net keycloak-network -v /home/smci/postgres_data:/var/lib/postgresql/data/ -d postgres
+docker run --name mysql -p 3306:3306 -d --net keycloak-network -e MYSQL_DATABASE=keycloak -e MYSQL_USER=keycloak -e MYSQL_PASSWORD=keycloak -e MYSQL_ROOT_PASSWORD=keycloak_root mysql
+
+
+docker run --name keycloak -p 5030:5030 -d -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:19.0.2 start-dev
+
+docker run --name keycloak -p 5030:5030 -d -net keycloak-network -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin -e KC_DB_PASSWORD=dima -e KC_DB=mypostgres -e KC_DB_USER_NAME=dima -e KC_DB_URL=jdbc:postgresql//mypostgres:5432/keycloak quay.io/keycloak/keycloak:19.0.2 start-dev
+docker run --name keycloak -p 5030:5030 -d --net keycloak-network -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin -e KC_DB_PASSWORD=keycloak -e KC_DB=mysql -e KC_DB_USER_NAME=keycloak -e KC_DB_URL=jdbc:mysql://mysql:3306/keycloak quay.io/keycloak/keycloak:19.0.2 start-dev --http-port=8100 --ssl-required=none
+
+
+docker run --name mysql -p 3306:3306 -d --net keycloak-network -e MYSQL_DATABASE=keycloak -e MYSQL_USER=keycloak -e MYSQL_PASSWORD=keycloak -e MYSQL_ROOT_PASSWORD=keycloak_root -v /tmp/mysql:/var/lib/mysql mysql
+
+ docker run --name keycloak -p 8080:8080 -d --net keycloak-network -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin -e KC_DB_PASSWORD=keycloak -e KC_DB=mysql -e KC_DB_USER_NAME=keycloak -e KC_DB_URL=jdbc:mysql://mysql:3306/keycloak -v /tmp/mysql:/var/lib/mysql quay.io/keycloak/keycloak:latest start-dev
+
+*********** new version 17
+docker run --name mysql17 -p 33017:3306 -d --net keycloak-network -e MYSQL_TCP_PORT=33017 -e MYSQL_DATABASE=keycloak -e MYSQL_USER=keycloak -e MYSQL_PASSWORD=keycloak -e MYSQL_ROOT_PASSWORD=keycloak_root -v /tmp/mysql_keycloak17:/var/lib/mysql mysql
+
+docker run --name keycloak17 -p 8081:8080 -d --net keycloak-network -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin -e KC_DB_PASSWORD=keycloak -e KC_DB=mysql -e KC_DB_USER_NAME=keycloak -e KEYCLOAK_HTTPS_PORT=8081  -e KC_DB_URL=jdbc:mysql://mysql17:33017/keycloak quay.io/keycloak/keycloak:17.0.0  -Djboss.http.port=8081  start-dev
+
+
+**********************
+Audience  https://stackoverflow.com/questions/53550321/keycloak-gatekeeper-aud-claim-and-client-id-do-not-match
+
+Show role
+

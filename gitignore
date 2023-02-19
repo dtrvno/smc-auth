@@ -1,0 +1,5 @@
+*.pyc
+.idea/
+__pycache__/
+app/__pycache__/
+smc_oauth.log
